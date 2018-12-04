@@ -4,5 +4,5 @@
 
 
 
-1. [simple multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel)
+1. [simple multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/1.simple%20multi%20channeling)
 
