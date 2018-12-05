@@ -29,6 +29,7 @@
 
 ```bash
 $ git clone https://github.com/pjt3591oo/hyperledger-fabric-multi-channel.git
+$ cd hyperledger-fabric-multi-channel
 ```
 
 
@@ -36,7 +37,6 @@ $ git clone https://github.com/pjt3591oo/hyperledger-fabric-multi-channel.git
 * binary 파일 다운로드
 
 ```bash
-$ cd hyperledger-fabric-multi-channel
 $ curl -sSL https://goo.gl/6wtTN5 | bash -s 1.1.0
 ```
 
@@ -53,7 +53,7 @@ $ curl -sSL https://goo.gl/6wtTN5 | bash -s 1.1.0
 * 피어 인증서 생성 파일
 
 ```bash
-$ cd hyperledger-fabric-multi-channel/network
+$ cd /network
 $ vim crypto-config.yaml
 ```
 
@@ -100,7 +100,7 @@ PeerOrgs:
 * Genesis, channel 정보 수정
 
 ```bash
-$ cd hyperledger-fabric-multi-channel/network
+$ cd network
 $ vim configtx.yaml
 ```
 
@@ -511,7 +511,7 @@ $ peer chaincode install -n mycc -v 1.0 -p github.com/chaincode/chaincode_exampl
 
 체인코드 배포시 옵션은 다음과 같습니다.
 
-n`: 체인코드 이름
+`n`: 체인코드 이름
 
 `v`: 체인코드 버전
 
@@ -677,7 +677,84 @@ Query Result: 100
 
 test1 채널의 데이터만 바뀌었습니다.
 
+## 체인코드 업데이트
 
+* test1에 설치된 체인코드 업데이트
+
+1. 변경된 체인코드 install
+2. 1번을 통해 각 노드가 새로운 체인코드 파일을 받으면 upgrade 해줌.
+
+체인코드 재배포시 `n` 옵션은 유지한 후 `v` 옵션에 새로운 버전을 명시합니다.
+
+패브릭 시스템은 체인코드 호출시 항상 최신버전을 참조합니다.
+
+### `install`
+
+* test1채널 peer0.org1 
+
+```bash
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+CORE_PEER_LOCALMSPID="Org1MSP"
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+
+peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+```
+
+* test1채널 peer1.org1 
+
+```bash
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+CORE_PEER_ADDRESS=peer1.org1.example.com:7051
+CORE_PEER_LOCALMSPID="Org1MSP"
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
+
+peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+```
+
+* test1채널 peer0.org2
+
+```bash
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+CORE_PEER_ADDRESS=peer0.org2.example.com:7051
+CORE_PEER_LOCALMSPID="Org2MSP"
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+
+peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+```
+
+* test1채널 peer1.org2
+
+```bash
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+CORE_PEER_ADDRESS=peer1.org2.example.com:7051
+CORE_PEER_LOCALMSPID="Org2MSP"
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
+
+peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+```
+
+### `upgrade`
+
+```
+peer chaincode upgrade -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C test1 -n mycc -v 2.0 -c '{"Args":["init","a", "100", "b","200"]}' 
+```
+
+## 체인코드 설치 확인
+
+* install
+
+```
+peer chaincode list  --installed
+```
+
+* instantiate
+
+```
+$ peer chaincode list --instantiated -C test1
+
+$ peer chaincode list --instantiated -C test2
+```
 
 ## 네트워크 완전 내리기
 
