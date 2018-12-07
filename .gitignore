@@ -1,3 +1,5 @@
 .DS_Store
-2.certificateMultiChanneling/api/node_modules
-2.certificateMultiChanneling/api/hfc-key-store
+2.certificateMultiChanneling/org1Api/node_modules
+2.certificateMultiChanneling/org1Api/hfc-key-store
+2.certificateMultiChanneling/org2Api/node_modules
+2.certificateMultiChanneling/org2Api/hfc-key-store
