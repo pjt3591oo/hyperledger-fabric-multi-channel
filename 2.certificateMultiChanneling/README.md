@@ -25,6 +25,12 @@
   * ca1(peer0.org1)
   * ca2(peer0.org2)
 
+* API 서버 2개
+
+  * org1(test1, test2 채널)용 API
+  * org2(test1 채널)용 API
+
+
 
 ## sample 코드 다운받기
 
