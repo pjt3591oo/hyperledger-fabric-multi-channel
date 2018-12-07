@@ -26,13 +26,13 @@ var tx_id = null;
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 
 async function invoke ({
-	func, args
+	func, args, channel
 }) {
 	fabric_client = new Fabric_Client();
 	channel = fabric_client.newChannel('test1');
-	peer = fabric_client.newPeer('grpc://127.0.0.1:7051');
+	peer = fabric_client.newPeer('grpc://127.0.0.1:9051');
 	channel.addPeer(peer);
-	order = fabric_client.newOrderer('grpc://127.0.0.1:7050')
+	order = fabric_client.newOrderer('grpc://127.0.0.1:9050')
 	channel.addOrderer(order);
 
 	let data;
@@ -64,7 +64,7 @@ async function invoke ({
 			chaincodeId: 'mycc', // -n 옵션
 			fcn: func,
 			args: args,
-			chainId: 'test1',  // -C 옵션
+			chainId: channel,  // -C 옵션
 			txId: tx_id
 		};
 
@@ -101,7 +101,7 @@ async function invoke ({
 			promises.push(sendPromise); //we want the send transaction first, so that we know where to check status
 			/*
 			let event_hub = fabric_client.newEventHub();
-			event_hub.setPeerAddr('grpc://127.0.0.1:7053');
+			event_hub.setPeerAddr('grpc://127.0.0.1:9053');
 				
 			let txPromise = new Promise((resolve, reject) => {
 				let handle = setTimeout(() => {

@@ -17,7 +17,7 @@ var os = require('os');
 var fabric_client = new Fabric_Client();
 
 var channel = fabric_client.newChannel('test1');
-var peer = fabric_client.newPeer('grpc://127.0.0.1:7051');
+var peer = fabric_client.newPeer('grpc://127.0.0.1:9051');
 
 
 channel.addPeer(peer);
@@ -27,7 +27,7 @@ var store_path = path.join(__dirname, '../hfc-key-store');
 console.log('Store path:'+store_path);
 var tx_id = null;
 
-async function query({func, args}){
+async function query({func, args, channel}){
 
 	return new Promise((resolve, reject) => {
 
@@ -55,7 +55,7 @@ async function query({func, args}){
 			
 			const request = {
 				//targets : --- letting this default to the peers assigned to the channel
-				chainId: 'test1',  // -C 옵션
+				chainId: channel,  // -C 옵션
 				chaincodeId: 'mycc', // -n 옵션
 				fcn: func,
 				args:args 

@@ -41,7 +41,7 @@ async function registerUser() {
                 verify: false
             };
             // be sure to change the http to https when the CA is running TLS enabled
-            fabric_ca_client = new Fabric_CA_Client('http://127.0.0.1:7054', null , '', crypto_suite);
+            fabric_ca_client = new Fabric_CA_Client('http://127.0.0.1:8054', null , '', crypto_suite);
 
             // first check to see if the admin is already enrolled
             return fabric_client.getUserContext('admin', true);
@@ -55,7 +55,7 @@ async function registerUser() {
 
             // at this point we should have the admin user
             // first need to register the user with the CA server
-            return fabric_ca_client.register({enrollmentID: 'user2', affiliation: 'org1.department1',role: 'client'}, admin_user);
+            return fabric_ca_client.register({enrollmentID: 'user2', affiliation: 'org2.department1',role: 'client'}, admin_user);
         }).then((secret) => {
             // next we need to enroll the user with CA server
             console.log('Successfully registered user - secret:'+ secret);
@@ -65,7 +65,7 @@ async function registerUser() {
         console.log('Successfully enrolled member user "user" ');
         return fabric_client.createUser(
             {username: 'user2',
-            mspid: 'Org1MSP',
+            mspid: 'Org2MSP',
             cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
             });
         }).then((user) => {

@@ -849,16 +849,17 @@ test1 채널의 데이터만 바뀌었습니다.
 
 # API 실행
 
+## org1
+
 앞에서 네트워크 구축을 완료했습니다. 이제 node.js를 이용하여 API 서버를 구축해보겠습니다. 
 
-해당 API는 `org1`에 붙어서 `test1` 채널을 통해 transaction을 발생시키고 데이터 조회를 합니다.
-
+해당 API는 `org1`에 붙어서 `test1`, `test2` 채널을 통해 transaction을 발생시키고 데이터 조회할 수 있습니다.
 
 
 * 의존성 모듈 설치 후 서버실행
 
 ```bash
-$ cd api
+$ cd org1Api
 $ npm i
 $ node ./bin/www
 ```
@@ -871,9 +872,11 @@ POST http://127.0.0.1:3000/admin/v1.0/enrollAdmin : 관리자 계정 생성
 
 POST http://127.0.0.1:3000/admin/v1.0/registerUser : 유저 계정 생성, 여기서 생성한 유저 계정으로 query와 invoke 발생
 
-GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a: query 호출
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a?channel=test1: test1 채널에서 query 호출
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a?channel=test2: test2 채널에서 query 호출
 
-POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10" }: invoke 호출
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }: test1 채널에서 invoke 호출
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test2" }: test2 채널에서 invoke 호출
 
 
 
@@ -903,6 +906,61 @@ API에서 invoke를 호출하여 해당 채널의 state를 바꾸어 주었습�
 ├── invoke.js
 └── query.js
 ```
+
+## org2
+
+앞에서 네트워크 구축을 완료했습니다. 이제 node.js를 이용하여 API 서버를 구축해보겠습니다. 
+
+해당 API는 `org2`에 붙어서 `test1` 채널을 통해 transaction을 발생시키고 데이터 조회할 수 있습니다.
+
+
+* 의존성 모듈 설치 후 서버실행
+
+```bash
+$ cd org2Api
+$ npm i
+$ node ./bin/www
+```
+
+
+
+* 테스트 요청
+
+POST http://127.0.0.1:3000/admin/v1.0/enrollAdmin : 관리자 계정 생성
+
+POST http://127.0.0.1:3000/admin/v1.0/registerUser : 유저 계정 생성, 여기서 생성한 유저 계정으로 query와 invoke 발생
+
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a?channel=test1: test1 채널에서 query 호출
+
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }: test1 채널에서 invoke 호출
+
+
+
+* test1채널 데이터 확인
+
+```bash
+$ peer chaincode query -C $CHANNEL_NAME -n mycc -c '{"Args":["query","a"]}'
+
+2018-12-07 09:30:16.700 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-12-07 09:30:16.700 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+Query Result: 80
+2018-12-07 09:32:16.704 UTC [main] main -> INFO 003 Exiting.....
+```
+
+API에서 invoke를 호출하여 해당 채널의 state를 바꾸어 주었습니다.
+
+
+
+* api 디렉터리 구조
+
+`./utils`에 fabric에 연동하는 코드가 포함되 있습니다.
+
+```bash
+./utils
+├── enrollAdmin.js
+├── registerUser.js
+├── invoke.js
+└── query.js
 
 
 
