@@ -16,21 +16,30 @@ var os = require('os');
 
 var fabric_client = new Fabric_Client();
 
-var channel = fabric_client.newChannel('test1');
-var peer = fabric_client.newPeer('grpc://127.0.0.1:7051');
-
-
-channel.addPeer(peer);
+var channel;
+var peer;
 
 var member_user = null;
 var store_path = path.join(__dirname, '../hfc-key-store');
 console.log('Store path:'+store_path);
 var tx_id = null;
 
-async function query({func, args, channel}){
+let channel1 = fabric_client.newChannel('test1');
+let channel2 = fabric_client.newChannel('test2');
+peer = fabric_client.newPeer('grpc://127.0.0.1:7051');
+channel1.addPeer(peer);
+channel2.addPeer(peer);
 
+async function query({func, args, ch}){
 	return new Promise((resolve, reject) => {
-
+		
+		if(ch == 'test1'){
+			channel = channel1
+		} else if (ch == 'test2'){
+			channel = channel2
+		} else {
+			reject('잘못된 채널정보')
+		}
 		// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 		Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		}).then((state_store) => {
@@ -55,7 +64,7 @@ async function query({func, args, channel}){
 			
 			const request = {
 				//targets : --- letting this default to the peers assigned to the channel
-				chainId: channel,  // -C 옵션
+				chainId: ch,  // -C 옵션
 				chaincodeId: 'mycc', // -n 옵션
 				fcn: func,
 				args:args 

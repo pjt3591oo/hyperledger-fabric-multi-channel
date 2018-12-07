@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     let func = "query"
 	
 	try{
-		let data = await query({args: args, func: func, channel: channel})
+		let data = await query({args: args, func: func, ch: channel})
 		return res.json(data)
 	} catch (err) {
 		return res.status(500).json(err)
@@ -31,7 +31,7 @@ router.post('/',  async(req, res) => {
 	let args = [data1, data2, data3]
 
     try{
-        let tx = await invoke({func: func, args: args, channel: channel})
+        let tx = await invoke({func: func, args: args, ch: channel})
 		return res.status(201).json(tx)
     } catch(err) {
         return res.status(500).json(err)

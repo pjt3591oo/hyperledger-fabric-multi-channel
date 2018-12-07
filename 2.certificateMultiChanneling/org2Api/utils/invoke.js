@@ -26,7 +26,7 @@ var tx_id = null;
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 
 async function invoke ({
-	func, args, channel
+	func, args, ch
 }) {
 	fabric_client = new Fabric_Client();
 	channel = fabric_client.newChannel('test1');
@@ -64,7 +64,7 @@ async function invoke ({
 			chaincodeId: 'mycc', // -n 옵션
 			fcn: func,
 			args: args,
-			chainId: channel,  // -C 옵션
+			chainId: ch,  // -C 옵션
 			txId: tx_id
 		};
 

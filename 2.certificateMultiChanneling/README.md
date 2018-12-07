@@ -939,6 +939,7 @@ POST http://127.0.0.1:3001/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b
 * test1채널 데이터 확인
 
 ```bash
+$ export CHANNEL_NAME=test1
 $ peer chaincode query -C $CHANNEL_NAME -n mycc -c '{"Args":["query","a"]}'
 
 2018-12-07 09:30:16.700 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
@@ -965,3 +966,4 @@ API에서 invoke를 호출하여 해당 채널의 state를 바꾸어 주었습�
 
 
 > SDK에 대해서 작성할 지 고민중...
+```
