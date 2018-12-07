@@ -30,6 +30,7 @@
 ```bash
 $ git clone https://github.com/pjt3591oo/hyperledger-fabric-multi-channel.git
 $ cd hyperledger-fabric-multi-channel
+$ cd 1.simpleMultiChanneling
 ```
 
 

@@ -33,6 +33,7 @@
 ```bash
 $ git clone https://github.com/pjt3591oo/hyperledger-fabric-multi-channel.git
 $ cd hyperledger-fabric-multi-channel
+$ cd 2.certificateMultiChanneling
 ```
 
 
@@ -205,8 +206,6 @@ Capabilities:
 
 
 
-
-
 ## 인증서 파일 생성
 
 ```bash
@@ -303,6 +302,172 @@ $ ls -ahl
 
 
 
+## CA 노드 설정
+
+해당 문서에서는 TLS 옵션을 설정하지 않고 진행합니다.
+
+
+
+```bash
+$ vim docker-compose-cli.yaml
+```
+
+
+
+```yaml
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+volumes:
+  orderer.example.com:
+  peer0.org1.example.com:
+  peer1.org1.example.com:
+  peer0.org2.example.com:
+  peer1.org2.example.com:
+  ca.org1.example.com:
+  ca.org2.example.com:
+
+networks:
+  byfn:
+
+services:
+
+  orderer.example.com:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.example.com
+    container_name: orderer.example.com
+    networks:
+      - byfn
+
+  peer0.org1.example.com:
+    container_name: peer0.org1.example.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.org1.example.com
+    networks:
+      - byfn
+
+  peer1.org1.example.com:
+    container_name: peer1.org1.example.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.org1.example.com
+    networks:
+      - byfn
+
+  peer0.org2.example.com:
+    container_name: peer0.org2.example.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.org2.example.com
+    networks:
+      - byfn
+
+  peer1.org2.example.com:
+    container_name: peer1.org2.example.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.org2.example.com
+    networks:
+      - byfn
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_TLS_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - ca.org1.example.com
+      - ca.org2.example.com
+      - orderer.example.com
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+      - peer0.org2.example.com
+      - peer1.org2.example.com
+    networks:
+      - byfn
+
+  ca.org1.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org1.example.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/81d5c0cc7204a36ac201b70b0a3fb593d527e236ae56d90f0cf66d5860636d7f_sk
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.example.com
+    networks:
+      - byfn
+
+  ca.org2.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org2.example.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/3e9d0c8da45a2deee218b40112028998708db50217135026ca5d32e2d514ae67_sk
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.example.com
+    networks:
+      - byfn
+```
+
+CA 노드는 각 기관(Org)마다 설치하는 형태입니다. CA에서**`FABRIC_CA_SERVER_CA_KEYFILE`**는 각 피어에서 ca 디렉토리의 파일명을 넣어줘야 합니다.
+
+예를 들어 ca.org1.example.com은 Org1번에 대한 인증노드이기 때문에 다음 경로에 있는 인증서를 등록합니다.
+
+```bash
+$ cd crypto-config/peerOrganizations/org1.example.com/ca
+$ ls 
+911ebb74393caba2b27a4ae285b32a0ab9bdc8d21b909fe1c5b773332e31b054_sk
+ca.org1.example.com-cert.pem
+```
+
+2개의 파일이 있는데 **`sk`**의 형태의 인증서 파일을 등록하면 됩니다. ca.org2도 마찬가지로 `crypto-config/peerOrganizations/org1.example.com/ca`에 있는 인증서를 넣어줍니다.
+
+```bash
+$ cd crypto-config/peerOrganizations/org2.example.com/ca
+$ ls
+fc57812fa88f858b8bd636ab40d032a730fbbad8a361b9bc2d15e0516bfd1a69_sk
+ca.org2.example.com-cert.pem
+```
+
+
+
 ## 네트워크 구동
 
 ```bash
@@ -338,7 +503,7 @@ docker-compose-cli.yaml에서 channel-artifacts와 crypto-config를 volue으로 
 
 ```bash
 $ export CHANNEL_NAME=test1
-$ peer channel create -o orderer.example.com:7050 -c test1 -f ./channel-artifacts/test1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ peer channel create -o orderer.example.com:7050 -c test1 -f ./channel-artifacts/test1.tx
 ```
 
 
@@ -347,7 +512,7 @@ $ peer channel create -o orderer.example.com:7050 -c test1 -f ./channel-artifact
 
 ```bash
 $ export CHANNEL_NAME=test2
-$ peer channel create -o orderer.example.com:7050 -c test2 -f ./channel-artifacts/test2.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ peer channel create -o orderer.example.com:7050 -c test2 -f ./channel-artifacts/test2.tx 
 ```
 
 
@@ -365,8 +530,6 @@ drwxr-xr-x 10 root root  340 Dec  4 02:37 scripts
 -rw-r--r--  1 root root  16K Dec  4 07:18 test1.block
 -rw-r--r--  1 root root  11K Dec  4 07:18 test2.block
 ```
-
-
 
 채널 파일을 block 파일로 만들어 줍니다.
 
@@ -455,7 +618,7 @@ $ peer channel join -b test1.block
 ```bash
 $ export CHANNEL_NAME=test1
 
-$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp CORE_PEER_ADDRESS=peer0.org1.example.com:7051 CORE_PEER_LOCALMSPID="Org1MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors_ch_test1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp CORE_PEER_ADDRESS=peer0.org1.example.com:7051 CORE_PEER_LOCALMSPID="Org1MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors_ch_test1.tx 
 ```
 
 
@@ -465,7 +628,7 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 ```bash
 $ export CHANNEL_NAME=test1
 
-$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors_ch_test1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors_ch_test1.tx 
 ```
 
 
@@ -475,7 +638,7 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 ```bash
 $ export CHANNEL_NAME=test2
 
-$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp CORE_PEER_ADDRESS=peer0.org1.example.com:7051 CORE_PEER_LOCALMSPID="Org1MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors_ch_test2.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp CORE_PEER_ADDRESS=peer0.org1.example.com:7051 CORE_PEER_LOCALMSPID="Org1MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors_ch_test2.tx 
 ```
 
 
@@ -583,7 +746,7 @@ $ CORE_PEER_LOCALMSPID="Org1MSP"
 
 $ CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 
-$ peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C $CHANNEL_NAME -n mycc -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+$ peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n mycc -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
 ```
 
 instantiate는 한번만 해주어도 됨. 오더 노드가 해당 해당 채널에 있는 기관 앵커피어에게 전달하고 앵커 피어는 하위 피어에게 전달함
@@ -608,7 +771,7 @@ $ CORE_PEER_LOCALMSPID="Org1MSP"
 
 $ CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 
-$ peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C $CHANNEL_NAME -n mycc -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member')"
+$ peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n mycc -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member')"
 ```
 
 
@@ -646,7 +809,7 @@ Query Result: 100
 
 ```bash
 $ export CHANNEL_NAME=test1
-$ peer chaincode invoke -o orderer.example.com:7050  --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem  -C $CHANNEL_NAME -n mycc -c '{"Args":["invoke","a","b","10"]}'
+$ peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n mycc -c '{"Args":["invoke","a","b","10"]}'
 
 2018-12-04 07:51:49.236 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
 2018-12-04 07:51:49.236 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
@@ -680,104 +843,67 @@ Query Result: 100
 
 test1 채널의 데이터만 바뀌었습니다.
 
-## 체인코드 업데이트
+> 참고: 이 다음 체인코드 업데이트 부분은 1.simpleMultiChanneling에서 참고할 것! 단, TLS 옵션을 false를 줬기 때문에 --tls와 --cafile 옵션을 없대도 됨
 
-* test1에 설치된 체인코드 업데이트
 
-1. 변경된 체인코드 install
-2. 1번을 통해 각 노드가 새로운 체인코드 파일을 받으면 upgrade 해줌.
 
-체인코드 재배포시 `n` 옵션은 유지한 후 `v` 옵션에 새로운 버전을 명시합니다.
+# API 실행
 
-패브릭 시스템은 체인코드 호출시 항상 최신버전을 참조합니다.
+앞에서 네트워크 구축을 완료했습니다. 이제 node.js를 이용하여 API 서버를 구축해보겠습니다. 
 
-### `install`
+해당 API는 `org1`에 붙어서 `test1` 채널을 통해 transaction을 발생시키고 데이터 조회를 합니다.
 
-* test1채널 peer0.org1 
 
-```bash
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-CORE_PEER_LOCALMSPID="Org1MSP"
-CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 
-peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
-```
-
-* test1채널 peer1.org1 
+* 의존성 모듈 설치 후 서버실행
 
 ```bash
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-CORE_PEER_LOCALMSPID="Org1MSP"
-CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
-
-peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+$ cd api
+$ npm i
+$ node ./bin/www
 ```
 
-* test1채널 peer0.org2
+
+
+* 테스트 요청
+
+POST http://127.0.0.1:3000/admin/v1.0/enrollAdmin : 관리자 계정 생성
+
+POST http://127.0.0.1:3000/admin/v1.0/registerUser : 유저 계정 생성, 여기서 생성한 유저 계정으로 query와 invoke 발생
+
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a: query 호출
+
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10" }: invoke 호출
+
+
+
+* test1채널 데이터 확인
 
 ```bash
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-CORE_PEER_LOCALMSPID="Org2MSP"
-CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+$ peer chaincode query -C $CHANNEL_NAME -n mycc -c '{"Args":["query","a"]}'
 
-peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
+2018-12-07 09:30:16.700 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-12-07 09:30:16.700 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+Query Result: 90
+2018-12-07 09:30:16.704 UTC [main] main -> INFO 003 Exiting.....
 ```
 
-* test1채널 peer1.org2
+API에서 invoke를 호출하여 해당 채널의 state를 바꾸어 주었습니다.
+
+
+
+* api 디렉터리 구조
+
+`./utils`에 fabric에 연동하는 코드가 포함되 있습니다.
 
 ```bash
-CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-CORE_PEER_LOCALMSPID="Org2MSP"
-CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
-
-peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go
-```
-
-### `upgrade`
-
-```
-peer chaincode upgrade -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C test1 -n mycc -v 2.0 -c '{"Args":["init","a", "100", "b","200"]}' 
-```
-
-## 체인코드 설치 확인
-
-* install
-
-```
-peer chaincode list  --installed
-```
-
-* instantiate
-
-```
-$ peer chaincode list --instantiated -C test1
-
-$ peer chaincode list --instantiated -C test2
-```
-
-## 네트워크 완전 내리기
-
-docker-compose로 네트워드 구동한 `ctrl + c`를 입력하여 빠져나온 후 다음 명령어를 입력합니다.
-
-
-
-```bash
-$ docker stop $(docker ps -qa)
-$ docker rm $(docker ps -qa)
-```
-
->  `$(docker ps -qa)`로 삭제할 경우 fabric 이외의 컨테이너들도 stop, rm될 수 있으니 조심할 것
-
-
-
-```bash
-$ docker volume prune
-$ docker network prune
+./utils
+├── enrollAdmin.js
+├── registerUser.js
+├── invoke.js
+└── query.js
 ```
 
 
 
+> SDK에 대해서 작성할 지 고민중...
