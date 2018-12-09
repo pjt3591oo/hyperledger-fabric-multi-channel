@@ -4,6 +4,17 @@
 
 
 
+## guides
+
 1. [simple multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/1.simpleMultiChanneling) : channel 2개, org 2개, peer 4개
 1. [certificate and multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/2.certificateMultiChanneling) : channel 2개, ca 2개, org 2개, peer 4개, API 2개
+
+
+
+## 추가
+
+1. 각 기관 설정(기관, 채널)
+2. 각 노드 설정
+
+
 
