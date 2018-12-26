@@ -1,6 +1,6 @@
 # hyperledger fabric multi channel 구성
 
-
+2개 이상의 채널 구성
 
 ## 노드구성
 

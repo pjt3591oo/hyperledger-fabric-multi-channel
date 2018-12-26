@@ -1,6 +1,8 @@
 # multi certificate AND multi channel 구성
 
+각 채널의 여러 기관을 포함시켜 네트워크 구성.
 
+각 기관은 해당 채널에 트랜잭션, 조회 API
 
 ## 노드구성
 
