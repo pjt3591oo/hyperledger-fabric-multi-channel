@@ -11,7 +11,7 @@
 
 3. [addOrgOnChannel 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/3.addOrgOnChanneling): channel 1개, org 2개, peer 4개 => org 1개, peer 2개 추가
 
-4. [kafka 연동(작성중)](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel): channel 2개, org 2개, peer 4개, Kafka 1개
+4. [kafka 연동 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/4.kafkaChanneling/network): channel 2개, org 2개, peer 4개, Kafka 1개
 
 
 ## setting
