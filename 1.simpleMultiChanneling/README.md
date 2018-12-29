@@ -21,6 +21,10 @@
   * peer0.org2
   * peer1.org2
 
+* orderer 1개
+
+    * orderer
+
 
 
 ## sample 코드 다운받기
@@ -307,7 +311,7 @@ $ ls -ahl
 $ docker-compose -f docker-compose-cli.yaml up
 ```
 
--d 옵션을 넣으면 한 터미널에서 작업이 가능하지만 로그를 보면서 진행하기 위해 터미널 하나를 더 띄워줍니다.
+`-d` 옵션을 넣으면 한 터미널에서 작업이 가능하지만 로그를 보면서 진행하기 위해 터미널 하나를 더 띄워줍니다.
 
 
 
@@ -490,7 +494,7 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 
 ### `체인코드 설치`
 
-test1과 test2 각각 체인코드를 설치합니다.
+test1과 test2에 참가된 피어들에게 체인코드 설치한다.
 
 
 
@@ -584,7 +588,7 @@ $ CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer
 $ peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C $CHANNEL_NAME -n mycc -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
 ```
 
-instantiate는 한번만 해주어도 됨. 오더 노드가 해당 해당 채널에 있는 기관 앵커피어에게 전달하고 앵커 피어는 하위 피어에게 전달함
+instantiate는 한번만 해주어도 됨. 오더 노드가 해당 해당 채널에 있는 기관 리더피어에게 전달하고 리더피어는 하위 피어에게 전달함
 
 
 
