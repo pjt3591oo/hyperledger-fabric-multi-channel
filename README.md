@@ -6,12 +6,12 @@
 
 ## guides
 
-1. [simple multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/1.simpleMultiChanneling) : channel 2개, org 2개, peer 4개
-1. [certificate and multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/2.certificateMultiChanneling) : channel 2개, ca 2개, org 2개, peer 4개, API 2개
+1. [simple multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/1.simpleMultiChanneling) : channel 2개, org 2개, peer 4개, orderer 1개
+1. [certificate and multi channeling 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/2.certificateMultiChanneling) : channel 2개, ca 2개, org 2개, peer 4개, API 2개, orderer 1개
 
-3. [addOrgOnChannel 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/3.addOrgOnChanneling): channel 1개, org 2개, peer 4개 => org 1개, peer 2개 추가
+3. [addOrgOnChannel 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/3.addOrgOnChanneling): channel 1개, org 2개, peer 4개, orderer 1개 => org 1개, peer 2개 추가
 
-4. [kafka 연동 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/4.kafkaChanneling/network): channel 2개, org 2개, peer 4개, Kafka 1개
+4. [kafka 연동 바로가기](https://github.com/pjt3591oo/hyperledger-fabric-multi-channel/tree/master/4.kafkaChanneling/network): channel 2개, org 2개, peer 4개, Kafka 3개, orderer 2개
 
 
 ## setting
