@@ -880,11 +880,11 @@ POST http://127.0.0.1:3000/admin/v1.0/enrollAdmin : 관리자 계정 생성
 
 POST http://127.0.0.1:3000/admin/v1.0/registerUser : 유저 계정 생성, 여기서 생성한 유저 계정으로 query와 invoke 발생
 
-GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a?channel=test1: test1 채널에서 query 호출
-GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a?channel=test2: test2 채널에서 query 호출
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a&channel=test1: test1 채널에서 query 호출
+GET http://127.0.0.1:3000/api/v1.0/chaincode?data=a&channel=test2: test2 채널에서 query 호출
 
-POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }: test1 채널에서 invoke 호출
-POST http://127.0.0.1:3000/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test2" }: test2 채널에서 invoke 호출
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  '{ "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }': test1 채널에서 invoke 호출
+POST http://127.0.0.1:3000/api/v1.0/chaincode -d  '{ "data1": "a",​ "data2": "b", "data3": "10", "channel": "test2" }': test2 채널에서 invoke 호출
 
 
 
@@ -938,9 +938,9 @@ POST http://127.0.0.1:3001/admin/v1.0/enrollAdmin : 관리자 계정 생성
 
 POST http://127.0.0.1:3001/admin/v1.0/registerUser : 유저 계정 생성, 여기서 생성한 유저 계정으로 query와 invoke 발생
 
-GET http://127.0.0.1:3001/api/v1.0/chaincode?data=a?channel=test1: test1 채널에서 query 호출
+GET http://127.0.0.1:3001/api/v1.0/chaincode?data=a&channel=test1: test1 채널에서 query 호출
 
-POST http://127.0.0.1:3001/api/v1.0/chaincode -d  { "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }: test1 채널에서 invoke 호출
+POST http://127.0.0.1:3001/api/v1.0/chaincode -d  '{ "data1": "a",​ "data2": "b", "data3": "10", "channel": "test1" }': test1 채널에서 invoke 호출
 
 
 
